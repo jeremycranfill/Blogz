@@ -10,11 +10,18 @@ jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir))
 
 
 
+
 class BlogPost(db.Model):
     title = db.StringProperty(required=True)
     created = db.DateTimeProperty(auto_now_add = True)
     body = db.StringProperty(required= True)
 
+def get_posts(limit, offset):
+    limit = limit
+    offset = offset
+    query = BlogPost.all().order("-created")
+    recent_blogs = query.fetch(offset=offset, limit=limit)
+    return recent_blogs
 
 
 class Handler(webapp2.RequestHandler):
@@ -26,12 +33,31 @@ class Handler(webapp2.RequestHandler):
 
 class BlogHandler(webapp2.RequestHandler):
     def get(self):
+        page =self.request.get("page")
+        blogTotal = BlogPost.all(keys_only=True).count()
+        if page:
+            page = int(page)
+        else:
+            page=1
+        nextPage=page+1
+        prevPage=page-1
+        recent_blogs = get_posts(5,((page-1)*5))
+        morePages =True
+        if blogTotal - page*5 < 1:
+            morePages = False
 
-        query = BlogPost.all().order("-created")
-        recent_blogs = query.fetch(limit = 5)
+
+
+
+
+        ##recent_blogs = get_posts(5,0)
+        ##query = BlogPost.all().order("-created")
+        ##recent_blogs = query.fetch(limit = 5)
         t = jinja_env.get_template("blog.html")
 
-        content = t.render(blogs = recent_blogs)
+
+
+        content = t.render(blogs = recent_blogs, page=page,nextPage=nextPage, prevPage=prevPage, morePages=morePages)
         self.response.write(content)
 
 class newPostHandler(webapp2.RequestHandler):

@@ -8,5 +8,12 @@
   <p> {{blog.body}}</p>
 {% endfor %}
 
+{% if morePages %}
+  <h2><a href="/?page={{nextPage}}">Next Page</a>
+{%endif%}
+{% if page > 1 %}
+  <a href="/?page={{prevPage}}">Previous Page</a>
+{% endif %}
+</h2>
 
 {% endblock %}
