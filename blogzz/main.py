@@ -14,7 +14,7 @@ jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir))
 class BlogPost(db.Model):
     title = db.StringProperty(required=True)
     created = db.DateTimeProperty(auto_now_add = True)
-    body = db.StringProperty(required= True)
+    body = db.StringProperty(required= True, multiline=True)
 
 def get_posts(limit, offset):
     limit = limit
